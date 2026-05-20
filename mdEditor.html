@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minislides Web Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.3/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.13.3/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.13.3/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        /* --- Editor UI Layout Styles --- */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #222; color: #fff;
+            overflow: hidden;
+        }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        #toolbar {
+            background: #111; padding: 10px 20px;
+            display: flex; gap: 10px; align-items: center;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+        }
+        button, label.btn {
+            background: #444; color: #fff; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            font-size: 14px; display: inline-block;
+        }
+        button:hover, label.btn:hover { background: #555; }
+        input[type="file"] { display: none; }
+        #workspace { display: flex; flex: 1; overflow: hidden; }
+        #editor-container, #preview-container {
+            flex: 1; display: flex; flex-direction: column; height: 100%;
+        }
+        #editor {
+            flex: 1; width: 100%; height: 100%;
+            background: #1e1e1e; color: #d4d4d4;
+            font-family: 'Fira Code', monospace; font-size: 14px;
+            padding: 15px; border: none; resize: none; outline: none;
+            line-height: 1.5;
+        }
+        #preview-container { background: #444; border-left: 2px solid #333; position: relative; }
+        #preview-iframe { width: 100%; height: 100%; border: none; background: #444; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="toolbar">
+        <label class="btn" for="open-file">Open Markdown</label>
+        <input type="file" id="open-file" accept=".md,.txt" onchange="openFile(event)">
+        
+        <button onclick="saveMarkdown()">Save Markdown</button>
+        <button onclick="exportHTML()" style="background: #718c00;">Export HTML</button>
+        <button onclick="printPDF()" style="background: #a04033;">Print PDF</button>
+    </div>
+
+    <div id="workspace">
+        <div id="editor-container">
+            <textarea id="editor" placeholder="Write your markdown slides here... Use '---' on a blank line to break slides." oninput="renderSlides()"></textarea>
+        </div>
+        <div id="preview-container">
+            <iframe id="preview-iframe"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- Core Presentation Engine Style Sheets ---
+const minislidesCSS = `
+@import url('https://fonts.googleapis.com/css?family=Red+Hat+Text&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Overlock&display=swap');
+:root {
+	--background-light: #fdfdfd;
+	--background-dark: #333; 
+	--text-dark: #444;
+	--box-vlight:#f6f6f6; 
+	--box-light:#f0f0f0; 
+	--green: #718c00;
+	--greenwhite: #A8D2A2;
+	--green1:#579C37;
+	--green2:#579C50;
+	--green3:#16A085;
+	--green4:#60A93E;
+	--green5: #619E45;
+	--red:#D15237;
+	--red1:#CD5C5C;
+	--red2:#E76662;
+	--red3: #b22;
+	--red4: #C8472D;
+	--red5: #D6644D;
+	--red6: #D15237;
+	--purple-pink:#CA5D7D;
+	--purple-dark:#885DCA;
+	--purple2:#AF77DE;
+	--blue: #4271ae;
+	--blue-fade:#5D93CA;
+	--orange: #f5871f; 
+	--gray-light: #bbbbbb;
+} 
+
+* { box-sizing: border-box; }
+body {
+    background: #444; 
+    margin: 0; 
+    padding: 15px; 
+    overflow-x: hidden; 
+    overflow-y: auto;   
+}
+
+.preview-viewport-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.slides-wrapper {
+    width: 1104px; 
+    transform-origin: 0 0; 
+    margin: 0;
+    padding: 0;
+}
+
+.slides { color:#444; font-size:1.7rem; counter-reset: section; }
+.slides h1, .slides h2, .slides p, .slides blockquote { text-align: left; width: 90%; max-width: 90%; color: var(--text-dark); }
+.slides h1 { padding: 4rem 0 1rem 0; font-size:3rem; opacity:0.85; box-shadow: inset 0 -3px var(--gray-light); }
+.slides h2 { font-size:2.5rem; padding-bottom:0.1rem; opacity:0.85; }
+.slides ul, .slides ol { width:100%; margin:0.1rem 0; line-height:1.7em; padding-top:0.5rem; padding-bottom:0.2rem; }
+.slides li { margin-left: 2rem;}
+
+.slides section {
+	position: relative; 
+    box-sizing: content-box; 
+    height: 775px; 
+    width: 1040px;
+	border: 1px solid #eee; 
+    margin: 0 0 25px 0; 
+    padding: 2rem 4rem 1rem 4rem; 
+    background: var(--background-light); 
+    font-family: "Overlock";
+    border-radius:15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.slides section::after {
+	position: absolute; bottom:1rem; right:1.5rem; counter-increment:section; content: counter(section) '/TOTAL_SLIDES_PLACEHOLDER'; font-size: 1rem; color: var(--text-dark); opacity: 0.7;
+} 
+.slides section:nth-child(1)::after { counter-increment: none; content: ''; }
+.slides .includehtml { background:#333; display: flex; flex-direction: column; }
+.slides .includehtml h3 { color:#eee; font-weight:bold; font-size:3.5rem; padding-top:4rem; } 
+.slides .includehtml ul { color:#eee; font-size:2rem; text-align:left; } 
+.slides .includehtml::after { counter-increment: none; content: ''; }
+.slides .thanks {
+	background:#333;
+	box-sizing:content-box; 
+	height: 775px;
+	width: 1040px;
+	border: 1rem solid #444;
+	margin: 1rem auto 1em auto;
+	padding: 2rem 4rem 1rem 4rem; 
+	display: flex; 
+	flex-direction: column; 
+    color:#eee; 
+}
+
+.slides .thanks::after {
+	counter-increment: none;
+	content: '';
+}
+
+.slides .thanks xthanks {
+    display:block;
+    align-items:center;
+	color:#bbb; 
+    text-align:center;
+    font-size:1.8rem;
+    margin-left:auto; margin-right:auto;
+    padding-bottom:4rem;
+    padding-left:2rem;
+} 
+
+.slides .thanks ul {
+    padding-left:1rem;
+    padding-bottom:1rem;
+    margin-top:0rem;
+	color:#bbb; 
+    font-size:1.6rem;
+} 
+
+.slides .thanks li {
+	color:#bbb; 
+} 
+
+.slides .thanks h2 {
+	color:#eee; 
+    padding-top:5rem;
+    margin-left:auto; margin-right:auto;
+	padding-bottom:1rem; 
+	font-weight:bold; 
+	text-align:center; 
+	font-size:3.5rem;
+} 
+.slides .references {
+	background:#333;
+	box-sizing:content-box; 
+	height: 775px;
+	width: 1040px;
+	border: 1rem solid #444;
+	margin: auto auto auto auto;
+	padding: 1rem 4rem 1rem 4rem; 
+	display: flex; 
+	flex-direction: column; 
+    color:#ddd; 
+}
+
+.slides .references::after {
+	counter-increment: none;
+	content: '';
+}
+    
+.slides .references ul {
+    padding-left:1rem;
+    padding-bottom:0.6rem;
+    margin-top:0rem;
+	color:#ddd; 
+    font-size:1.8rem;
+    padding-top:0;
+} 
+
+.slides .references li {
+	color:#ddd; 
+} 
+
+.slides .references h2 {
+	color:#eee; 
+	font-size:2.4rem;
+    font-weight:bold;
+} 
+
+.slides .centered { background:#333; box-sizing:content-box; height: 775px; width: 1040px; border: 1px solid #eee; margin: 0 0 25px 0; padding: 2rem 4rem 1rem 4rem; display: flex; flex-direction: column; color:#eee; border-radius:15px; }
+.slides .centered::after { counter-increment: none; content: ''; }
+.slides .centered h2 { color:#fff; margin:auto; padding-bottom:4rem; font-weight:bold; text-align:center; font-size:3.5rem; } 
+.slides .subtitle {margin: 1rem 0;font-size: 2rem; opacity: 0.7;}
+.slides .author {margin: 4rem 0 0 0;font-size: 2rem; opacity: 0.7; font-weight:bold;}
+.slides .affiliation {margin: 0.8rem 0; opacity: 0.7; color:rgb(10,90,5);font-weight:bold;}
+
+/* Custom Structural Theorem Blocks Styles from make.py */
+.slides thm, .slides thmc, 
+.slides prop, .slides propc, 
+.slides defi, .slides defic, 
+.slides fact, .slides factc, 
+.slides quest, .slides questc,  
+.slides ex, .slides exc, .slides box {
+	display:block; 
+	background-color:var(--box-vlight); 
+	border:0.1em #ddd solid; 
+	border-radius:15px; 
+	color:#444; 
+	text-align:left; 
+	margin:2rem 1rem 2rem 1rem; 
+	padding:1rem 1.5rem 0.5rem 1.5rem; 
+	width:90%; 
+	line-height:1.4em; 
+	hyphens:none;
+	font-family:"Overlock"; 
+}
+
+.slides questce {
+	display:block; 
+	border:0.1em #ddd solid; 
+	border-radius:15px; 
+	color:#444; text-align:left; 
+	margin:1rem; 
+	padding:1rem 1.5rem 1rem 1.5rem; 
+	width:90%; 
+	line-height:1.4em; 
+	hyphens:none;
+}
+
+.slides thm::after, .slides thmc::after, 
+.slides prop::after, .slides propc::after, 
+.slides defi::after, .slides defic::after, 
+.slides fact::after, .slides factc::after, 
+.slides quest::after, .slides questc::after, .slides questce::after,  
+.slides ex::after, .slides exc::after, .slides box::after {margin:0.5rem;}
+
+.slides thmc::before,
+.slides propc::before,  
+.slides defic::before,
+.slides factc::before,
+.slides exc::before {font-weight:bold; color:var(--green);}
+
+.slides questc::before,
+.slides questce::before {font-weight:bold; color:var(--red);}
+
+.slides thm::before, 
+.slides prop::before, 
+.slides defi::before,
+.slides fact::before,
+.slides quest::before, 
+.slides ex::before {padding-bottom:0.3rem; display:block; font-weight:bold; color:var(--green);}
+
+.slides thm::before{content:"Theorem";}
+.slides prop::before{content:"Proposition";}
+.slides defi::before{content:"Definition";}
+.slides fact::before{content:"Fact";}
+.slides quest::before{content:"Question";}
+.slides ex::before{content:"Example";}
+
+.slides thmc::before{content:"Theorem. ";}
+.slides propc::before{content:"Proposition. ";}
+.slides defic::before{content:"Definition. ";}
+.slides factc::before{content:"Fact. ";}
+.slides questc::before{content:"Question. ";}
+.slides questce::before{content:"Question. ";}
+.slides exc::before{content:"Example. ";}
+
+.slides thm ul, .slides thmc ul, .slides box ul,
+.slides prop ul, .slides propc ul, 
+ .slides defi ul, .slides defic ul, 
+.slides fact ul, .slides factc ul,
+.slides quest ul, .slides questc ul, .slides questce ul, 
+.slides ex ul, .slides exc ul {padding-top:0.5rem;}
+
+.slides thm ul li, .slides thmc ul li, 
+.slides box ul li, .slides prop ul li, 
+.slides propc ul li, .slides defi ul li,
+.slides defic ul li, .slides fact ul li, 
+.slides factc ul li, .slides quest ul li, 
+.slides questc ul li, .slides questce ul li, .slides ex ul li, 
+.slides exc ul li {margin-left:0em; line-height:3rem; }
+
+.slides r {color:var(--red); font-weight:normal;}
+.slides rb {color:var(--red); font-weight:bold;}
+.slides g {color:var(--green);}
+.slides gw {color:#8FC680;}
+.slides pur {color:#B186C3; font-weight:bold; font-size: 1.6rem;}
+.slides ref {color:#E9967A;}
+.slides gb {color:var(--green); font-weight:bold;}
+
+.slides p {hyphens:none; margin:0.2rem 0; line-height:1.3em;}
+.slides i, .slides em {color:var(--red); font-style:normal;}
+.slides b, .slides strong {color:var(--green);}
+.slides code, .slides pre {font-family:'Fira Code', monospace;font-size:1.2rem;background:none; width:80%;}
+.slides p code, .slides ul code, .slides ol code {color:var(--blue);}
+.slides pre {text-align:left;max-width:100%;}
+.slides pre code {margin:1rem 0;overflow-x:scroll;}
+.slides a {text-decoration:none;color:var(--blue);}
+.slides img {padding-top:2rem; width:95%;}
+.slides img.large {max-width:100%;max-height:100%;}
+.slides table {margin:1rem 0; overflow:scroll; border-collapse:collapse;}
+.slides th, .slides td {padding:0.2rem 0.5rem;}
+.slides thead {border-bottom:2px solid var(--text-dark);}
+.katex {font-size:1em !important;}
+
+/* CROSS-BROWSER MULTI-PAGE PRINT STABILIZATION */
+@media print {
+  @page {
+    size: 1040px 775px;
+    margin: 0 !important;
+  }
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 1040px !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .slides { 
+    display: block !important; 
+    overflow: visible !important; 
+    width: 1040px !important; 
+    height: auto !important;
+    margin: 0 !important; 
+    padding: 0 !important;
+  }
+  .slides section, .slides .thanks, .slides .centered { 
+    display: block !important;
+    position: relative !important;
+    box-sizing: content-box !important;
+    height: 775px !important; 
+    width: 1040px !important; 
+    margin: 0 auto !important;
+    padding: 2rem 4rem 1rem 4rem !important;
+    border: none !important; 
+    border-radius: 0px !important; 
+    box-shadow: none !important; 
+    
+    page-break-before: always !important; 
+    break-before: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    overflow: hidden !important;
+  }
+  .slides section:first-child, 
+  .slides .thanks:first-child, 
+  .slides .centered:first-child {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+  }
+}
+`;
+
+const navigationJS = `
+var slides=document.getElementsByTagName("section");
+var totalSlides=slides.length;
+var prev=[37,75,72]; var next=[39,74,76,13];
+function percentageVisible(element){
+	const viewHeight=(window.innerHeight||document.documentElement.clientHeight);
+	const bounds=element.getBoundingClientRect();
+	if(bounds.bottom<0||bounds.top>viewHeight){return 0;}
+	if(bounds.top<0&&bounds.bottom>viewHeight){return bounds.height*100/viewHeight;}
+	else if(bounds.top<0){return bounds.bottom*100/viewHeight;}
+	else if(bounds.bottom>viewHeight){return(viewHeight-bounds.top)*100/viewHeight;}
+	return 100;
+}
+function getCurrentSlide(){
+	var index=0; var maxPercent=0;
+	for(var i=0;i<totalSlides;i++){
+		let p=percentageVisible(slides[i]); if(p>maxPercent){index=i; maxPercent=p;}
+	}
+	return index;
+}
+function navigate(nextSlide){
+	let target=nextSlide;if(nextSlide<0){target=0;} else if(nextSlide>=totalSlides){target=totalSlides-1;}
+	window.scrollTo(0,slides[target].offsetTop * parseFloat(document.querySelector('.slides-wrapper')?.style.transform.replace(/[^0-9.]/g, '') || 1));
+}
+document.addEventListener("keydown",event=>{
+	let code=event.keyCode;
+	if(prev.includes(code)){navigate(getCurrentSlide()-1);} else if(next.includes(code)){navigate(getCurrentSlide+1);}
+});
+`;
+
+// --- FIX: Explicitly restrict container height to crop unscaled blank space ---
+const previewResizerJS = `
+function autofitSlides() {
+    const wrapper = document.querySelector('.slides-wrapper');
+    const container = document.querySelector('.preview-viewport-container');
+    if (!wrapper || !container) return;
+    
+    const targetWidth = 1104; 
+    const availableWidth = window.innerWidth - 30; 
+    
+    const scale = (availableWidth / targetWidth) * 0.94;
+    wrapper.style.transform = "scale(" + scale + ")";
+    
+    // Calculate the physical space the scaled content actually occupies
+    const unscaledHeight = wrapper.scrollHeight;
+    container.style.height = (unscaledHeight * scale) + "px";
+}
+window.addEventListener('resize', autofitSlides);
+window.addEventListener('DOMContentLoaded', autofitSlides);
+setTimeout(autofitSlides, 100);
+`;
+
+// --- Business Logic ---
+
+const defaultMarkdown = `title: My Custom Presentation
+subtitle: Fixed Dynamic Page Engine & Layout
+author: Jane Doe
+affiliation: Mathematics & Computer Science
+coauthors: John Smith
+
+\\newcommand{\\leT}{<_T}
+\\newcommand{\\zj}{\\emptyset'}
+\\newcommand{\\geqT}{\\geq_T}
+
+
+---
+
+## Slide 1: Page Numbers Fixed
+
+
+Verifying that your custom script macros render cleanly in the workspace window, and page numbers count dynamically:
+
+* Real numbers domain: $\\RR^2$
+* Fields configuration: $\\FF_q$
+* External macros: $\\zj$
+* Finite Sequences mapping: $\\twomel \\to \\twome$
+* Natural and Rational representations: $\\Nat \\subset \\Rat$
+* Parameterized macro formatting: $\\sqbrad{x}{f(x)=2}$ or $f(x)\\de$ or $f(x)\\un$ and $x\\restr_n$
+* $\\pzt$ and $\\dbra{x\\restr_n}$ and $\\DNC$
+---
+## Slide 2: Block Containers Validation
+Below are the custom parsed layout blocks adapted from your configuration parameters:
+
+<thm>
+Let $X$ be an infinite topological subspace. Then its degree of structure is bounded by $\\pz$ calculations under criteria $\\sqbrad{y}{\\alpha \\le y}$.
+</thm>
+
+<ex>
+A basic sample instance can be verified over standard arithmetic domains using $\\tuple{x, y}$.
+</ex>
+`;
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('editor').value = defaultMarkdown;
+    renderSlides();
+});
+
+function parseBlock(block) {
+    let className = "";
+    block = block.trim();
+    
+    if (block.startsWith("center\n") || block.startsWith("center\r\n")) { className = " class='centered'"; block = block.replace(/^center[\r\n]+/, ""); }
+    else if (block.startsWith("thanks\n") || block.startsWith("thanks\r\n")) { className = " class='thanks'"; block = block.replace(/^thanks[\r\n]+/, ""); }
+    else if (block.startsWith("iframe\n") || block.startsWith("iframe\r\n")) { className = " class='includehtml'"; block = block.replace(/^iframe[\r\n]+/, ""); }
+    else if (block.startsWith("frozen\n") || block.startsWith("frozen\r\n")) { className = " class='frozen'"; block = block.replace(/^frozen[\r\n]+/, ""); }
+
+    let htmlContent = marked.parse(block);
+    htmlContent = htmlContent.replace(/<p>(<img[\s\S]*?)<\/p>/g, '$1');
+
+    return `<section${className}>\n${htmlContent}</section>\n`;
+}
+
+function parseCustomEditorMacros(markdownText) {
+    let parsedArray = [];
+    const cmdRegex = /\\(?:newcommand|renewcommand)\s*\{\s*\\([a-zA-Z0-9]+)\s*\}\s*(?:\[(\d+)\])?\s*\{([\s\S]*?)\}\s*(?=\n|$)/g;
+    
+    let match;
+    while ((match = cmdRegex.exec(markdownText)) !== null) {
+        const macroName = match[1];
+        const argsCount = match[2] ? parseInt(match[2]) : null;
+        let expansion = match[3].trim();
+        
+        // New strategy: escape for JS double quotes + minimal for KaTeX
+        let safelyEscapedExpansion = expansion
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+            .replace(/'/g, "\\'");
+        
+        const key = `\\\\${macroName}`;
+        
+        if (argsCount !== null) {
+            parsedArray.push(`'${key}': ["${safelyEscapedExpansion}", ${argsCount}]`);
+        } else {
+            parsedArray.push(`'${key}': "${safelyEscapedExpansion}"`);
+        }
+    }
+    return parsedArray.join(',\n      ');
+}
+
+function buildHTMLDocument(markdownText, isForPreview = false) {
+    const dynamicMacrosBlock = parseCustomEditorMacros(markdownText);
+    let cleanMarkdown = markdownText.replace(/^[ \t]*\\(newcommand|renewcommand|def|DeclareMathOperator).*$/gm, "");
+    
+    const blocks = cleanMarkdown.split(/\n---\n|\r\n---\r\n/);
+    const header = blocks[0] || "";
+
+    let meta = { title: "", subtitle: "", author: "", coauthors: "", affiliation: "" };
+    header.split(/\r?\n/).forEach(line => {
+        const match = line.match(/^(title|subtitle|author|coauthors|affiliation)\s*:\s*(.*)$/i);
+        if (match) { meta[match[1].toLowerCase()] = match[2].trim(); }
+    });
+
+    let titleSection = `
+    <section>
+        <h1>${meta.title}</h1>
+        <p class="subtitle">${meta.subtitle}</p>
+        <p class="author">${meta.author}</p>
+        <p class="affiliation">${meta.affiliation}</p>
+        <p class="coauthors">${meta.coauthors}</p>
+    </section>`;
+
+    let numberedSlidesCount = 0;
+    blocks.slice(1).forEach(block => {
+        let b = block.trim();
+        if (!b.startsWith("center\n") && !b.startsWith("center\r\n") &&
+            !b.startsWith("thanks\n") && !b.startsWith("thanks\r\n") &&
+            !b.startsWith("iframe\n") && !b.startsWith("iframe\r\n") &&
+            !b.startsWith("frozen\n") && !b.startsWith("frozen\r\n")) {
+            numberedSlidesCount++;
+        }
+    });
+
+    const dynamicCSS = minislidesCSS.replace('TOTAL_SLIDES_PLACEHOLDER', numberedSlidesCount);
+
+    const slideSections = blocks.slice(1).map(parseBlock).join('');
+    const fullSlides = titleSection + slideSections;
+
+    const regularContent = `<div class="slides">${fullSlides}</div>`;
+    const previewWrappedContent = `
+    <div class="preview-viewport-container">
+        <div class="slides-wrapper">
+            <div class="slides">${fullSlides}</div>
+        </div>
+    </div>`;
+
+	    const dynamicKatexJS = `
+	document.addEventListener("DOMContentLoaded", function() {
+	  renderMathInElement(document.body, {
+	    delimiters:[
+	      {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, 
+	      {left: '\\\\(', right: '\\\\)', display: false}, {left: '\\\\[', right: '\\\\]', display: true}
+	    ],
+	    macros: {
+	      '\\\\RR': '\\\\mathbb{R}', 
+	      '\\\\FF': '\\\\mathbb{F}',
+	      '\\\\CC': '\\\\mathcal{C}', 
+	      '\\\\twome': '2^{\\\\omega}',
+	      '\\\\twomel': '2^{<\\\\omega}',
+	      '\\\\Nat': '\\\\mathbb{N}',
+	      '\\\\Rat': '{\\\\mathbb Q}',
+	      '\\\\ds': '\\\\textup{\\\\textsf{d}}',
+	      '\\\\restr': '\\\\upharpoonright',
+	      '\\\\un': '\\\\uparrow',
+	      '\\\\de': '\\\\downarrow',
+	      '\\\\inv': '^{-1}',
+	      '\\\\pz': '\\\\Pi^0_1',
+	      '\\\\pzt': '\\\\Pi^0_2',
+	      '\\\\abs': '|{#1}|',
+	      '\\\\dom': '\\\\mathsf{dom}',
+	      '\\\\DNC': '\\\\mathsf{DNC}',
+	      '\\\\tuple': '\\\\langle {#1} \\\\rangle',
+	      '\\\\dbra': '\\\\llbracket {#1} \\\\rrbracket',
+          '\\\\sqbrad': '\\\\{ {#1} : {#2} \\\\}'${dynamicMacrosBlock ? ',\n      ' + dynamicMacrosBlock : ''}
+	    },
+	    throwOnError : false
+	  });
+	});
+	`;
+
+console.log("Macros:", dynamicMacrosBlock);
+
+    return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${meta.title || 'Slides'}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"><\/script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.3/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.3/dist/katex.min.js"><\/script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.3/dist/contrib/auto-render.min.js"><\/script>
+<style type="text/css" media="all">
+${dynamicCSS}	
+</style></head><body>
+${isForPreview ? previewWrappedContent : regularContent}
+<script type="text/javascript" charset="utf-8">
+hljs.highlightAll();
+${dynamicKatexJS}
+${navigationJS}
+${isForPreview ? previewResizerJS : ''}
+<\/script></body></html>`;
+}
+
+function renderSlides() {
+    const markdownText = document.getElementById('editor').value;
+    const compiledHTML = buildHTMLDocument(markdownText, true);
+    
+    const iframe = document.getElementById('preview-iframe');
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    
+    iframeDoc.open();
+    iframeDoc.write(compiledHTML);
+    iframeDoc.close();
+}
+
+function openFile(event) {
+    const input = event.target;
+    if (!input.files || input.files.length === 0) return;
+    
+    const reader = new FileReader();
+    reader.onload = function() {
+        document.getElementById('editor').value = reader.result;
+        renderSlides();
+    };
+    reader.readAsText(input.files[0]);
+}
+
+function saveMarkdown() {
+    const text = document.getElementById('editor').value;
+    const blob = new Blob([text], { type: 'text/markdown' });
+    triggerDownload(blob, 'slides.md');
+}
+
+function exportHTML() {
+    const text = document.getElementById('editor').value;
+    let nativeHTML = buildHTMLDocument(text, false);
+    const blob = new Blob([nativeHTML], { type: 'text/html' });
+    triggerDownload(blob, 'presentation.html');
+}
+
+function printPDF() {
+    const iframe = document.getElementById('preview-iframe');
+    if (!iframe || !iframe.contentWindow) return;
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const slidesContainer = iframeDoc.querySelector('.slides');
+    const previewWrapper = iframeDoc.querySelector('.preview-viewport-container');
+
+    if (slidesContainer && previewWrapper) {
+        iframeDoc.body.appendChild(slidesContainer);
+        previewWrapper.style.display = 'none';
+
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+
+        setTimeout(() => {
+            const wrapperInner = iframeDoc.querySelector('.slides-wrapper');
+            if (wrapperInner) {
+                wrapperInner.appendChild(slidesContainer);
+            }
+            previewWrapper.style.display = 'block';
+            if (iframe.contentWindow.autofitSlides) {
+                iframe.contentWindow.autofitSlides();
+            }
+        }, 500);
+    } else {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    }
+}
+
+function triggerDownload(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+window.addEventListener('resize', () => {
+    const iframe = document.getElementById('preview-iframe');
+    if(iframe.contentWindow && iframe.contentWindow.autofitSlides) {
+        iframe.contentWindow.autofitSlides();
+    }
+});
+</script>
+</body>
+</html>
