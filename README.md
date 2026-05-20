@@ -14,42 +14,40 @@ Based on the [cli version](https://github.com/bob7/md_slides)
 
 <img src="Editor_screenshot.png" width="800" />
 
-
-## Slide Types (you can also add your own)
-Start slide with keyword + `\n---\n`
+## Slide Types
+Start slide with keyword + `---`
 
 - `center`: Centered dark slide  
   ```markdown
   center
+  ---
   # Main Title
   Large centered text
-  ---
   ```
 - `thanks`: Thanks slide  
   ```markdown
   thanks
+  ---
   # Thank You!
   - Q&A
-  ---
   ```
 - `iframe`: Include HTML (dark flex)  
   ```markdown
   iframe
-  <iframe src="demo.html"></iframe>
   ---
+  <iframe src="demo.html"></iframe>
   ```
 - `frozen`: No page number  
   ```markdown
   frozen
-  Hidden slide content
   ---
   ```
 - `references`: References list  
   ```markdown
   references
+  ---
   # References
   - [1] Author, Title
-  ---
   ```
 
 ## Environment Blocks
