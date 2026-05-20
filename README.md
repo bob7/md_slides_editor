@@ -8,7 +8,7 @@ Markdown Live Editor that supports:
 
 [Demo](http://barmpalias.net/share/md_slides/)
 
-Based on the [cli version](https://github.com/bob7/md_slides) ()
+Based on the [cli version](https://github.com/bob7/md_slides)
 
 <img src="Editor_screenshot.png" width="800" />
 
