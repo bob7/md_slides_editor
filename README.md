@@ -21,14 +21,14 @@ Start slide with keyword + `---`
   ```markdown
   center
   ---
-  # Main Title
+  ## New section
   Large centered text
   ```
 - `thanks`: Thanks slide  
   ```markdown
   thanks
   ---
-  # Thank You!
+  ## Thank You!
   - Q&A
   ```
 - `iframe`: Include HTML (dark flex)  
@@ -46,7 +46,7 @@ Start slide with keyword + `---`
   ```markdown
   references
   ---
-  # References
+  ## References
   - [1] Author, Title
   ```
 
