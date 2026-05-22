@@ -161,9 +161,6 @@ What is the complexity of
 probabilistic inversions of positive partial computable functions?
 </questc>
 
---
---
-
 ---
 center
 
@@ -343,9 +340,6 @@ Injective oneway functions require partiality:
 Every total computable random-preserving oneway function is almost nowhere injective: $f^{-1}(f(x))$ is perfect for almost all $x$.
 </propc>
 
---
---
-
 ---
 center
 
@@ -410,9 +404,10 @@ There is a total computable  $f:\twome\to\twome$ such that:
 
 Let $f(x\oplus z):=h^z(x)\oplus z$ and 
 
+
 $$
 k^z_{s+1}:=\begin{cases}
-s+1 &  \textrm{if $k^z_{s}\in \zj_{s}$ or $z(\tuple{k^z_{s},s})=1$} \\\\
+s+1 &  \textrm{if $k^z_s \in  \emptyset^\prime_s$ or $z(\tuple{k^z_{s},s})=1$} \\\\
 k^z_{s} &  \textrm{otherwise.}
 \end{cases}
 $$
@@ -452,30 +447,6 @@ and the latter  holds for the restriction of $f$ in any cylinder $\sigma$.
 Let $z^n$ be the $n$th column of $z$ and $U$ a member of a universal test.
 </box>
 
-
----
-
-
-Given $z$ let  $k^z_s$ be the non-decreasing <g>counter</g> with  
-$$
-k^z_{s+1}:=\begin{cases}
-s+1 &  \textrm{if $d^z_{s}\in \zj_{s}$ or $z^{d^z_{s}}\in U_s$} \\\\
-\ \ k^z_{s} &  \textrm{otherwise}
-\end{cases}
-$$
-where $d^z_{s}:=\abs{\sqbrad{t<s}{k^z_{t+1}\neq k^z_{t}}}$ counts the updates of $k^z$ and
-$$
-p^z_s:=\begin{cases}
-s+1 &  \textrm{if $k^z_{s+1}=k^z_{s}$} \\\\
-\ \ k^z_{s} &  \textrm{otherwise}
-\end{cases}
-$$
-Updates of  $k^z$ coincide with those of $d^z$ and are due to one of:
-
--  $d^z_{s}\in \zj_{s}$ which we call  <g> $\zj$-permission</g> of $k^z_{s}$ at $s+1$
--  $z^{d^z_{s}}\in U_s$ which we call  <g> $z$-permission</g> of $k^z_{s}$ at $s+1$.
-
-
 ---
 
 <thmc>
@@ -499,9 +470,6 @@ Effectively in $y\oplus w$ and  $n$ we can  define $z$ and  $s$ such that
 <box>
 Given a.e. inversion $g$, use $g(f(x\oplus z))$ to determine if $n\in \zj$.
 </box>
-
---
---
 
 ---
 center
@@ -757,9 +725,6 @@ There is a total computable function which is
 
 </thmc>
 
---
---
-
 ---
 center
 
@@ -805,9 +770,6 @@ If $f$ is partial computable and random-preserving there is $h$ which
 - has $\Pi^0_1(\emptyset'')$ domain and positive $\Pi^0_1(\emptyset'')$ range.
 
 </thm>
-
---
---
 
 ---
 thanks
