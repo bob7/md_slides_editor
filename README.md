@@ -53,12 +53,14 @@ Start slide with keyword + `---`
 ## Environment Blocks
 
 ### Theorems & Definitions
-- `<thm>`: Theorem block  
+
   ```markdown
   <thm>
   Pythagoras: \(a^2 + b^2 = c^2\)
   </thm>
   ```
+
+- `<thm>`: Theorem block  
 - `<thmc>`: Inline Theorem
 - `<prop>`, `<propc>`: Proposition
 - `<defi>`, `<defic>`: Definition
@@ -66,12 +68,12 @@ Start slide with keyword + `---`
 - `<ex>`, `<exc>`: Example
 
 ### Questions
-- `<quest>`: Question block (red label)  
   ```markdown
   <quest>
   Is P=NP?
   </quest>
   ```
+- `<quest>`: Question block (red label)  
 - `<questc>`: Inline Question. 
 - `<questce>`: Compact question block
 
@@ -85,6 +87,10 @@ Start slide with keyword + `---`
 
 ## Inline Tags 
 
+  ```markdown
+  <r>warning</r>
+  ```
+
 ### Color/Style
 - `<r>`: red text
 - `<rb>`: bold red
@@ -96,6 +102,3 @@ Start slide with keyword + `---`
 - `<i>`, `<em>`: red italic-like
 - `<b>`, `<strong>`: green bold
 
-  ```markdown
-  <r>warning</r>
-  ```
