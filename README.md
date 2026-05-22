@@ -81,12 +81,18 @@ Start slide with keyword + `---`
 ## Inline Tags 
 
 ### Color/Style
-- `<r>`: red text. Ex: `<r>warning</r>`.
-- `<rb>`: bold red. Ex: `<rb>ERROR</rb>`
-- `<g>`: green. Ex: `<g>success</g>` 
-- `<gw>`: light green. Ex: `<gw>note</gw>` 
-- `<gb>`: bold green. Ex: `<gb>OK</gb>` 
-- `<pur>`: purple bold large. Ex: `<pur>Title</pur>` 
-- `<ref>`: salmon. Ex: `<ref>[1]</ref>` 
-- `<i>`, `<em>`: red italic-like. Ex: `<i>emphasis</i>` 
-- `<b>`, `<strong>`: green bold. Ex: `<b>bold</b>` 
+- `<r>`: red text
+- `<rb>`: bold red
+- `<g>`: green
+- `<gw>`: light green
+- `<gb>`: bold green
+- `<pur>`: purple bold large
+- `<ref>`: salmon
+- `<i>`, `<em>`: red italic-like
+- `<b>`, `<strong>`: green bold
+
+Example:
+
+  ```markdown
+  <r>warning</r>
+  ```
