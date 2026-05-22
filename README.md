@@ -46,15 +46,14 @@ Start slide with keyword + `---`
 
 ## Environment Blocks
 
-### Theorems & Definitions (you can also add your own)
+### Theorems & Definitions 
 - `<thm>`: Theorem block  
   ```markdown
   <thm>
   Pythagoras: \(a^2 + b^2 = c^2\)
   </thm>
   ```
-- `<thmc>`: Inline Theorem.  
-  Ex: `<thmc> E=mc² </thmc>` → **Theorem.** E=mc²
+- `<thmc>`: Inline Theorem
 - `<prop>`, `<propc>`: Proposition
 - `<defi>`, `<defic>`: Definition
 - `<fact>`, `<factc>`: Fact
