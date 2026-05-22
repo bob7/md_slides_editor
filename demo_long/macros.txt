@@ -1,0 +1,137 @@
+\newcommand{\WtR}{\mathsf{W2R}}
+\newcommand{\rs}{\mathsf{r}}
+\newcommand{\pfun}{:\subseteq\twome\to\twome}
+\newcommand{\tfun}{:\twome\to\twome}
+\newcommand{\pztj}{\Pi^0_2(\emptyset')}
+\newcommand{\pzm}{\Pi^{\mu}_1}
+\newcommand{\pztm}{\Pi^{\mu}_2}
+\newcommand{\pzjm}{\Pi^{\mu}_1(\emptyset')}
+\newcommand{\pzjjm}{\Pi^{\mu}_1(\emptyset'')}
+\newcommand{\pztjm}{\Pi^{\mu}_2(\emptyset')}
+\newcommand{\szj}{\Sigma^{0}_1(\emptyset')}
+\newcommand{\szjj}{\Sigma^0_1(\emptyset'')}
+\newcommand{\szm}{\Sigma^{\mu}_1}
+\newcommand{\sztm}{\Sigma^{\mu}_2}
+\newcommand{\pzn}{\Pi^{\nu}_1}
+\newcommand{\pzjjn}{\Pi^{\nu}_1(\emptyset'')}
+\newcommand{\pzjn}{\Pi^{\nu}_1(\emptyset')}
+\newcommand{\pztn}{\Pi^{\nu}_2}
+\newcommand{\lowO}{\mathsf{Low}(\Omega)}
+\newcommand{\szn}{\Sigma^{\nu}_1}
+\newcommand{\sztn}{\Sigma^{\nu}_2}
+\newcommand{\bigon}{\textup{\textsf{O}}}
+\newcommand{\snu}{$_\nu$\hspace{0.05cm}}
+\newcommand{\twolo}{2^{<\omega}}
+\newcommand{\KA}{\mathsf{KA}}
+\newcommand{\Koba}{\mathsf{Kob}}  
+\newcommand{\ps}{\textsf{\textup p}}
+\newcommand{\ts}{\textup{\textsf{t}}}
+\newcommand{\Ws}{\textsf{W}} 
+\newcommand{\Us}{\mathsf{U}} 
+\newcommand{\Ds}{\mathsf{D}} 
+\newcommand{\Bs}{\mathsf{B}} 
+\newcommand{\Os}{\mathsf{O}} 
+\newcommand{\Rs}{\mathsf{R}} 
+\newcommand{\Vs}{\mathsf{V}} 
+\newcommand{\Fs}{\mathsf{F}} 
+\newcommand{\Ms}{\mathsf{M}} 
+\newcommand{\Hs}{\mathsf{H}} 
+\newcommand{\Cs}{\mathsf{C}} 
+\newcommand{\Tb}{\mathbf{T}}
+\newcommand{\Ss}{\mathsf{S}} 
+\newcommand{\Es}{\mathsf{E}}
+\newcommand{\Ps}{\mathsf{P}} 
+\newcommand{\Gs}{\mathsf{G}} 
+\newcommand{\Qs}{\mathsf{Q}} 
+\newcommand{\qs}{\mathsf{q}}
+\newcommand{\Ts}{\mathsf{T}} 
+\newcommand{\As}{\mathsf{A}} 
+\newcommand{\LL}{\mathcal{L}} 
+\newcommand{\EE}{\mathcal{E}} 
+\newcommand{\XX}{\mathcal{X}} 
+\newcommand{\II}{\mathcal{I}} 
+\newcommand{\YY}{\mathcal{Y}} 
+\newcommand{\HH}{\mathcal{H}} 
+\newcommand{\DD}{\mathcal{D}} 
+\newcommand{\CC}{\mathcal{C}} 
+\newcommand{\Fb}{\mathbf{F}} 
+\newcommand{\Mb}{\mathbf{M}} 
+\newcommand{\Rb}{\mathbf{R}} 
+\newcommand{\Hb}{\mathbf{H}} 
+\newcommand{\hb}{\mathbf{h}} 
+\newcommand{\dd}{\mathbf{d}} 
+\newcommand{\mm}{\mathbf{m}} 
+\newcommand{\ds}{\textup{\textsf{d}}} 
+\newcommand{\uu}{\mathbf{u}} 
+\newcommand{\Is}{\mathsf{I}} 
+\newcommand{\TTast}{\mathcal{T}^{\ast}}
+\newcommand{\TT}{\mathcal T}
+\newcommand{\VV}{\mathcal V} 
+\newcommand{\GG}{\mathcal G} 
+\newcommand{\RR}{\mathcal R} 
+\newcommand{\FF}{\mathcal F} 
+\newcommand{\KK}{\mathcal{K}} 
+\newcommand{\Rat}{{\mathbb Q}} 
+\newcommand{\Nat}{\mathbb{N}} 
+\newcommand{\Real}{{\mathbb R}} 
+\newcommand{\PA}{\mathsf{PA}} 
+\newcommand{\DNC}{\textsf{\textup{DNC}}} 
+\newcommand{\DNR}{\mathsf{DNR}} 
+\newcommand{\ML}{\mathsf{ML}}
+\newcommand{\pzj}{\Pi^0_1(\emptyset')} 
+\newcommand{\pzjj}{\Pi^0_1(\emptyset'')} 
+\newcommand{\pzt}{\Pi^0_2} 
+\newcommand{\pzth}{\Pi^0_3} 
+\newcommand{\szt}{\Sigma^0_2} 
+\newcommand{\szth}{\Sigma^0_3} 
+\newcommand{\sz}{\Sigma^0_1} 
+\newcommand{\ml}{Martin-L\"{o}f } 
+\newcommand{\ce}{c.e.\ } 
+\newcommand{\cen}{c.e.} 
+\newcommand{\pf}{prefix-free } 
+\newcommand{\pfn}{prefix-free} 
+\newcommand{\eg}{e.g.\ } 
+\newcommand{\aed}{a.e.\ dominating\ } 
+\newcommand{\aedn}{a.e.\ dominating} 
+\newcommand{\hthree}{\hspace{0.3cm}} 
+\newcommand{\twomel}{2^{<\omega}} 
+\newcommand{\twome}{2^{\omega}} 
+\newcommand{\dom}{\mathsf{dom}} 
+\newcommand{\zp}{\mathbf{0}'} 
+\newcommand{\zj}{\emptyset'} 
+\newcommand{\zjj}{\emptyset''}
+\newcommand{\zjjj}{\emptyset'''} 
+\newcommand{\zd}{\textup{\textbf{0}}}
+\newcommand{\zjd}{\textup{\textbf{0}}'} 
+\newcommand{\zjjd}{\textup{\textbf{0}}''} 
+\newcommand{\wedga}{\ \wedge\ } 
+\newcommand{\impl}{\implies} 
+\newcommand{\restr}{\upharpoonright} 
+\newcommand{\un}{\uparrow} 
+\newcommand{\de}{\downarrow} 
+\newcommand{\inv}{^{-1}} 
+\newcommand{\leqT}{\leq_T} 
+\newcommand{\leT}{<_T} 
+\newcommand{\geqT}{\geq_T} 
+\newcommand{\equivT}{\equiv_T} 
+\newcommand{\leqlr}{\leq_{LR}} 
+\newcommand{\geqlr}{\geq_{LR}} 
+\newcommand{\equivlr}{\equiv_{LR}}
+\newcommand{\ks}{\textup{\textsf{k}}} 
+\newcommand{\pz}{\Pi^0_1} 
+\newcommand{\omet}{\omega^\omega} 
+\newcommand{\omel}{\omega^{<\omega}} 
+\newcommand{\boplus}{\bar\oplus} 
+\newcommand{\asto}{^\ast}
+\newcommand{\lce}{left-c.e.\ }
+\newcommand{\rce}{right-c.e.\ }
+\newcommand{\parlr}[1]{\left({#1}\right)}
+\newcommand{\alert}[1]{\textcolor{red!80!black}{{#1}}}
+\newcommand{\parb}[1]{\big({#1}\big)} 
+\newcommand{\abs}[1]{|{#1}|} 
+\newcommand{\absd}[1]{|\!|{#1}|\!|} 
+\newcommand{\parB}[1]{\Big(\hspace{0.04cm}{#1}\hspace{0.04cm}\Big)} 
+\newcommand{\sep}{\begin{center}\textcolor{gray}{\rule{10cm}{1pt}}\end{center}} 
+\newcommand{\sqbrad}[2]{\lbrace #1 : #2 \rbrace}
+\newcommand{\tuple}[1]{\langle{#1}\rangle} 
+\newcommand{\dbra}[1]{\llbracket #1 \rrbracket}
