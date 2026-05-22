@@ -78,7 +78,7 @@ Start slide with keyword + `---`
   </box>
   ```
 
-## Inline Tags (you can also add your own)
+## Inline Tags 
 
 ### Color/Style
 - `<r>`: red text  
