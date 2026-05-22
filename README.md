@@ -81,22 +81,12 @@ Start slide with keyword + `---`
 ## Inline Tags 
 
 ### Color/Style
-- `<r>`: red text  
-  Ex: `<r>warning</r>` → <span style="color:#D15237">warning</span>
-- `<rb>`: bold red  
-  Ex: `<rb>ERROR</rb>` → <b style="color:#D15237">ERROR</b>
-- `<g>`: green  
-  Ex: `<g>success</g>` → <span style="color:#718c00">success</span>
-- `<gw>`: light green  
-  Ex: `<gw>note</gw>` → <span style="color:#8FC680">note</span>
-- `<gb>`: bold green  
-  Ex: `<gb>OK</gb>` → <b style="color:#718c00">OK</b>
-- `<pur>`: purple bold large  
-  Ex: `<pur>Title</pur>` → <b style="color:#B186C3;font-size:1.6rem">Title</b>
-- `<ref>`: salmon  
-  Ex: `<ref>[1]</ref>` → <span style="color:#E9967A">[1]</span>
-- `<i>`, `<em>`: red italic-like  
-  Ex: `<i>emphasis</i>` → <span style="color:#D15237">emphasis</span>
-- `<b>`, `<strong>`: green bold  
-  Ex: `<b>bold</b>` → <b style="color:#718c00">bold</b>
-
+- `<r>`: red text. Ex: `<r>warning</r>`.
+- `<rb>`: bold red. Ex: `<rb>ERROR</rb>`
+- `<g>`: green. Ex: `<g>success</g>` 
+- `<gw>`: light green. Ex: `<gw>note</gw>` 
+- `<gb>`: bold green. Ex: `<gb>OK</gb>` 
+- `<pur>`: purple bold large. Ex: `<pur>Title</pur>` 
+- `<ref>`: salmon. Ex: `<ref>[1]</ref>` 
+- `<i>`, `<em>`: red italic-like. Ex: `<i>emphasis</i>` 
+- `<b>`, `<strong>`: green bold. Ex: `<b>bold</b>` 
