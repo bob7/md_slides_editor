@@ -44,9 +44,15 @@ Start slide with keyword + `---`
   ---
   ```
 
+## Import image
+```markdown
+![](./img/shuffle/3.png)
+  ```
+
+
 ## Environment Blocks
 
-### Theorems & Definitions 
+### Theorems & Definitions
 - `<thm>`: Theorem block  
   ```markdown
   <thm>
@@ -89,8 +95,6 @@ Start slide with keyword + `---`
 - `<ref>`: salmon
 - `<i>`, `<em>`: red italic-like
 - `<b>`, `<strong>`: green bold
-
-Example:
 
   ```markdown
   <r>warning</r>
