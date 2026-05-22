@@ -1,11 +1,11 @@
 Markdown Live Editor that supports:
 
 - Katex and custom latex macros
-- Exports slides in html and pdf format
+- Export in html and pdf format
 - html/Javascript imports (dynamic, animations etc.)
 - colors, font decorations with custom html tags
 - image imports from local folders
-- several theorem environments
+- several theorem and box environments
 - several side types (references, contents etc.)
 
 [Demo](http://barmpalias.net/share/md_slides/)
