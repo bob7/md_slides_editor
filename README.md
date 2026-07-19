@@ -8,7 +8,7 @@ Markdown Live Editor that supports:
 - several theorem and box environments
 - several side types (references, contents etc.)
 
-[Demo](http://barmpalias.net/share/md_slides/)
+[Demo](http://barmpalias.net/share/mdslides)
 
 Based on the [cli version](https://github.com/bob7/md_slides)
 
